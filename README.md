@@ -12,6 +12,25 @@ This document summarizes the target architecture described in [DREAM_ARCHITECTUR
 - **DWH enrichments**: demographic attributes, credit profile, lifecycle markers, periodic aggregates.
 - **Reference data**: product catalog, allowed combinations/constraints, fallback popular items for cold start.
 
+## Sampling T-ECD data for development
+See [spec/README.md](spec/README.md) for detailed storage layout and privacy notes. Use the curated bucket when possible; for a
+custom sample filtered by user hash, use the helper script below (requires `pyarrow` and `s3fs`):
+
+```bash
+python scripts/sample_t_ecd.py \
+  --source s3://t-ecd-prod/payments/year=2024/month=12/day=01/ \
+  --dest ./data/payments_sampled \
+  --user-count 10000 \
+  --profile psb-data
+
+# Adjust sampling rate (e.g., ~0.2% of users)
+python scripts/sample_t_ecd.py \
+  --source s3://t-ecd-prod/payments/year=2024/month=12/day=01/ \
+  --dest ./data/payments_sampled_dense \
+  --hash-mod 500 \
+  --profile psb-data
+```
+
 ## Components & Responsibilities
 - **Data ingestion**
   - Batch exports from core systems/DWH; streaming via Kafka topics (e.g., `bank.transactions`, `bank.product_events`, `campaign.interactions`).
