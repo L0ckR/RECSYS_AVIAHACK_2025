@@ -39,6 +39,12 @@ This document summarizes the target architecture described in [DREAM_ARCHITECTUR
 - **Streaming/Kafka**
   - Topic schemas for transactions, product events, and feedback events; contracts include idempotency keys and versioned message schemas.
 
+## Local API & gRPC stubs
+- A stubbed FastAPI service lives in `services/api/main.py` with OpenAPI output in `services/api/openapi.json`.
+- Run the REST API locally with `uvicorn services.api.main:app --reload --port 8080`.
+- Protobuf contracts are defined in `proto/recommendation.proto`; generated Python artifacts live in `proto/generated/`.
+- Start the gRPC stub via `python -m services.grpc.server` (listens on port `50051`).
+
 ## Deployment Targets (Yandex Cloud)
 - **Compute**: Managed Kubernetes (Yandex Managed Service for Kubernetes) for API and online serving; serverless functions optional for lightweight endpoints.
 - **Data**: Yandex Managed Kafka for streams; Managed ClickHouse or Yandex Data Proc (Spark) for batch processing; Object Storage for raw/parquet dumps; YDB/PostgreSQL for feature store/metastore.

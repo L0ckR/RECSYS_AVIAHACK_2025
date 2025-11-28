@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package psb.recommendation.v1;
+
+option go_package = "github.com/psb/recommendation/v1;recommendation";
+
+message RecommendationRequest {
+  string user_id = 1;
+  string channel = 2;
+  int32 top_k = 3;
+  map<string, string> context = 4;
+  string correlation_id = 5;
+}
+
+message RecommendationItem {
+  string product_id = 1;
+  string product_name = 2;
+  double score = 3;
+  repeated string reasons = 4;
+}
+
+message RecommendationResponse {
+  string user_id = 1;
+  string generated_at = 2;
+  string correlation_id = 3;
+  repeated RecommendationItem recommendations = 4;
+}
+
+message FeedbackEvent {
+  string rec_id = 1;
+  string user_id = 2;
+  string event_type = 3;
+  string timestamp = 4;
+  map<string, string> attributes = 5;
+  string correlation_id = 6;
+}
+
+message FeedbackAck {
+  string status = 1;
+  string correlation_id = 2;
+}
+
+service RecommendationService {
+  rpc GetRecommendations(RecommendationRequest) returns (RecommendationResponse);
+  rpc SendFeedback(FeedbackEvent) returns (FeedbackAck);
+}
