@@ -1,0 +1,78 @@
+airflow:
+  executor: KubernetesExecutor
+  defaultAirflowRepository: apache/airflow
+  defaultAirflowTag: 2.8.2
+  fernetKey: "PLEASE_GENERATE_ME"
+  webserverSecretKey: "CHANGE_ME"
+
+  dags:
+    gitSync:
+      enabled: true
+      repo: https://github.com/example/recsys.git
+      branch: main
+      subPath: dags
+      sshKeySecret: ""
+      syncWait: 60
+
+  connections:
+    - id: aws_default
+      type: aws
+      description: Yandex Object Storage access
+      extra: '{"region_name": "ru-central1"}'
+    - id: dataproc_spark
+      type: spark
+      description: Yandex Data Proc Spark master endpoint
+      host: dataproc-master
+      port: 7077
+    - id: slack_alerts
+      type: http
+      description: Slack webhook for DAG alerts
+      host: https://hooks.slack.com/services
+      extra: '{"webhook_token": "replace-with-token"}'
+
+  variables:
+    s3_raw_bucket: recsys-raw
+    s3_raw_prefix: raw/events
+    mlflow_tracking_uri: http://mlflow:5000
+
+  env:
+    - name: AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT
+      value: "True"
+    - name: AIRFLOW__CORE__LOAD_EXAMPLES
+      value: "False"
+    - name: AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG
+      value: "1"
+    - name: MLFLOW_TRACKING_URI
+      value: http://mlflow:5000
+
+  logs:
+    persistence:
+      enabled: true
+      existingClaim: "airflow-logs-pvc"
+
+  metrics:
+    enabled: true
+    statsd:
+      enabled: true
+
+  ingress:
+    enabled: true
+    web:
+      host: airflow.example.yandexcloud.net
+
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "1"
+      memory: "2Gi"
+
+nodeSelector:
+  yc.yandex.cloud/node-group: airflow-workers
+
+tolerations:
+  - key: dedicated
+    value: airflow
+    effect: NoSchedule
+

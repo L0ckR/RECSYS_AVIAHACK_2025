@@ -1,0 +1,8 @@
+apiVersion: v2
+name: managed-airflow
+version: 0.1.0
+description: Umbrella chart for deploying Airflow with recommender DAGs in Yandex Managed Service for Kubernetes
+dependencies:
+  - name: airflow
+    version: 1.13.0
+    repository: https://airflow.apache.org

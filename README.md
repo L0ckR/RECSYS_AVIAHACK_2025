@@ -46,3 +46,8 @@ This document summarizes the target architecture described in [DREAM_ARCHITECTUR
 
 ## Traceability
 - For detailed rationale, design variants, and narrative context, see [DREAM_ARCHITECTURE.MD](DREAM_ARCHITECTURE.MD).
+
+## Airflow orchestration assets
+- `dags/recommender_pipeline.py`: daily DAG orchestrating S3 ingestion → Spark feature engineering on Yandex Data Proc → MLflow training/registration → artifact export to serving storage with partition/backfill controls and monitoring callbacks.
+- `scripts/bootstrap_yandex_managed_airflow.sh`: helper script to provision Yandex Managed Airflow/Data Proc resources, push DAGs, and register required connections/variables.
+- `helm/managed-airflow`: Helm chart values to deploy Airflow with Git-synced DAGs, Object Storage/Data Proc/Slack connections, and StatsD/log persistence settings.
